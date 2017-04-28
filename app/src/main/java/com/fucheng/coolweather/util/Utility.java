@@ -5,6 +5,8 @@ import android.text.TextUtils;
 import com.fucheng.coolweather.db.City;
 import com.fucheng.coolweather.db.County;
 import com.fucheng.coolweather.db.Province;
+import com.fucheng.coolweather.gson.Weather;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,6 +23,8 @@ public class Utility {
     public static boolean handleProvinceResponse(String response){
         if(!TextUtils.isEmpty(response)){
             try{
+                //省市县的数据比较简单就不使用GSON，直接使用JSONArray和JSONObject来解析数据
+
                 JSONArray allProvinces=new JSONArray(response);
                 for(int i=0;i<allProvinces.length();i++){
                     JSONObject provinceObject=allProvinces.getJSONObject(i);
@@ -82,5 +86,20 @@ public class Utility {
             }
         }
         return false;
+    }
+
+    /**
+     * 将返回的JSON数据解析成Weather实体类
+     */
+    public static Weather handleWeatherResponse(String response) {
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather");
+            String weatherContent = jsonArray.getJSONObject(0).toString();
+            return new Gson().fromJson(weatherContent, Weather.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
